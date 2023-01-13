@@ -4,68 +4,6 @@ import java.awt.*;
 
 public class Solitaire extends JFrame {
 
-    private class StockPanel extends JPanel {
-        int nrOfCards;
-        JPanel cardPanel;
-
-        StockPanel ( JButton browse ) {
-            super ( new FlowLayout ( FlowLayout.CENTER, 0, -3 ) );
-            nrOfCards = board.Stock.size ( );
-            cardPanel = new JPanel ( );
-
-            setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
-            setBackground ( new Color ( 0x2b7b3b ) );
-            setBorder ( BorderFactory.createLineBorder ( new Color ( 0x34a249 ), 3 ) );
-
-            cardPanel.setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
-            cardPanel.setBorder ( BorderFactory.createLineBorder ( Color.WHITE, 3 ) );
-            cardPanel.setBackground ( Color.BLUE );
-            cardPanel.setLayout ( new FlowLayout ( FlowLayout.CENTER, 0, -3 ) );
-
-            browse.setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
-            browse.setOpaque ( false );
-            browse.setContentAreaFilled ( false );
-            browse.setBorderPainted ( false );
-            browse.setFocusable ( false );
-
-            browse.addActionListener ( e -> visualBrowse ( ) );
-
-            cardPanel.add ( browse );
-
-            add ( cardPanel );
-        }
-
-
-    }
-
-    private class PilePanel extends JPanel {
-
-        int nrOfCards;
-        final Board.Pile pile;
-
-        CardPanel cardPanel1 = null;
-        CardPanel cardPanel2 = null;
-        CardPanel cardPanel3 = null;
-
-        public void pack ( ) {
-
-        }
-
-        public void update ( ) {
-
-        }
-
-        PilePanel ( Board.Pile correspondingPile ) {
-            super ( new FlowLayout ( FlowLayout.CENTER, 0, 0 ) );
-            nrOfCards = correspondingPile.size ( );
-            pile = correspondingPile;
-
-            setBackground ( new Color ( 0xFF0000/*0x2b7b3b*/ ) );
-            pack ( );
-        }
-
-    }
-
     public static class CardPanel extends JPanel {
 
         private static final int cardWidth;
@@ -79,6 +17,10 @@ public class Solitaire extends JFrame {
         private final JLabel bigSuite;
         private final JLabel number;
 
+        private final JPanel upperPanel;
+
+        private final JPanel lowerPanel;
+
         static {
             Dimension screenSize = Toolkit.getDefaultToolkit ( ).getScreenSize ( );
             cardWidth = Math.round ( screenSize.width * 0.0296875f );
@@ -87,13 +29,19 @@ public class Solitaire extends JFrame {
         }
 
         CardPanel ( Card correspondingCard ) {
-            super ( new GridBagLayout ( ) );
+            super ( new FlowLayout ( FlowLayout.CENTER, 0, 0 ) );
             card = correspondingCard;
             covered = CardCoverState.COVERED;
+            upperPanel = new JPanel ( new FlowLayout ( FlowLayout.CENTER, 0, 0 ) );
+            lowerPanel = new JPanel ( new FlowLayout ( FlowLayout.CENTER, 0, 0 ) );
             correspondingCard.cardPanel = this;
 
-            setBorder ( new LineBorder ( Color.WHITE, 5 ) );
+            setBorder ( new LineBorder ( Color.WHITE, 3 ) );
             setPreferredSize ( new Dimension ( cardWidth, cardHeight ) );
+            setVisible ( false );
+
+            upperPanel.setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight ) );
+            lowerPanel.setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight * 4 ) );
 
             smallSuite = new JLabel ( );
             bigSuite = new JLabel ( );
@@ -140,37 +88,122 @@ public class Solitaire extends JFrame {
                 number.setForeground ( Color.RED );
             }
 
-            //add ( );
-            //TODO: implement CardPanel.update() method
-            //TODO: complete implementing this constructor
+            smallSuite.setPreferredSize ( new Dimension ( cardWidth / 2, partiallyCoveredCardHeight ) );
+            number.setPreferredSize ( new Dimension ( cardWidth / 2, partiallyCoveredCardHeight ) );
+            bigSuite.setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight * 4 ) );
+
+            upperPanel.add ( number );
+            upperPanel.add ( smallSuite );
+            lowerPanel.add ( bigSuite );
+
+            add ( upperPanel );
+            add ( lowerPanel );
         }
 
-        public void update ( ) {
+        public void updateCardPanel ( ) {
             if ( card.faceUp ) {
-                setBackground ( Color.WHITE );
-                smallSuite.setVisible ( true );
-                bigSuite.setVisible ( true );
-                number.setVisible ( true );
+                setBorder ( null );
+                setBackground ( Color.BLACK );
+                upperPanel.setVisible ( true );
+
+                if ( covered == CardCoverState.COVERED ) {
+                    setVisible ( false );
+                }
+                else if ( covered == CardCoverState.PARTIALLY_COVERED ) {
+                    setVisible ( true );
+                    lowerPanel.setVisible ( false );
+                    setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight ) );
+                    setBorder ( BorderFactory.createMatteBorder ( 1, 1, 0, 1, Color.GRAY ) );
+                }
+                else {
+                    setVisible ( true );
+                    lowerPanel.setVisible ( true );
+                    setPreferredSize ( new Dimension ( cardWidth, cardHeight ) );
+                    setBorder ( BorderFactory.createLineBorder ( Color.GRAY, 1 ) );
+                }
             }
             else {
                 setBackground ( Color.BLUE );
-                smallSuite.setVisible ( false );
-                bigSuite.setVisible ( false );
-                number.setVisible ( false );
-            }
+                upperPanel.setVisible ( false );
+                lowerPanel.setVisible ( false );
 
-            if ( covered == CardCoverState.COVERED ) {
-                setVisible ( false );
-            }
-            else if ( covered == CardCoverState.PARTIALLY_COVERED ) {
-                setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight ) );
-                setVisible ( true );
-            }
-            else {
-                setPreferredSize ( new Dimension ( cardWidth, cardHeight ) );
-                setVisible ( true );
+                if ( covered == CardCoverState.COVERED ) {
+                    setVisible ( false );
+                }
+                else if ( covered == CardCoverState.PARTIALLY_COVERED ) {
+                    setVisible ( true );
+                    setPreferredSize ( new Dimension ( cardWidth, partiallyCoveredCardHeight ) );
+                    setBorder ( BorderFactory.createMatteBorder ( 3, 3, 0, 3, Color.WHITE ) );
+                }
+                else {
+                    setVisible ( true );
+                    setPreferredSize ( new Dimension ( cardWidth, cardHeight ) );
+                    setBorder ( BorderFactory.createLineBorder ( Color.WHITE, 3 ) );
+                }
             }
         }
+    }
+
+    private class StockPanel extends JPanel {
+        int nrOfCards;
+        JPanel cardPanel;
+
+        StockPanel ( JButton browse ) {
+            super ( new FlowLayout ( FlowLayout.CENTER, 0, -3 ) );
+            nrOfCards = board.Stock.size ( );
+            cardPanel = new JPanel ( );
+
+            setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
+            setBackground ( new Color ( 0x2b7b3b ) );
+            setBorder ( BorderFactory.createLineBorder ( new Color ( 0x34a249 ), 3 ) );
+
+            cardPanel.setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
+            cardPanel.setBorder ( BorderFactory.createLineBorder ( Color.WHITE, 3 ) );
+            cardPanel.setBackground ( Color.BLUE );
+            cardPanel.setLayout ( new FlowLayout ( FlowLayout.CENTER, 0, -3 ) );
+
+            browse.setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
+            browse.setOpaque ( false );
+            browse.setContentAreaFilled ( false );
+            browse.setBorderPainted ( false );
+            browse.setFocusable ( false );
+
+            browse.addActionListener ( e -> visualBrowse ( ) );
+
+            cardPanel.add ( browse );
+
+            add ( cardPanel );
+        }
+
+
+    }
+
+    private class PilePanel extends JPanel {
+
+        int nrOfCards;
+        final Board.Pile pile;
+
+        CardPanel cardPanel1 = null;
+        CardPanel cardPanel2 = null;
+        CardPanel cardPanel3 = null;
+
+        public void pack ( ) {
+            if ( getComponentCount ( ) < 2 )
+                setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
+            else if ( getComponentCount ( ) == 2 )
+                setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight + CardPanel.partiallyCoveredCardHeight ) );
+            else
+                setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight + CardPanel.partiallyCoveredCardHeight * 2 ) );
+        }
+
+        PilePanel ( Board.Pile correspondingPile ) {
+            super ( new FlowLayout ( FlowLayout.CENTER, 0, 0 ) );
+            nrOfCards = correspondingPile.size ( );
+            pile = correspondingPile;
+
+            pack ( );
+        }
+
     }
 
     private Board board;
@@ -187,10 +220,10 @@ public class Solitaire extends JFrame {
     private final JButton browse = new JButton ( );
 
     private CardPanel[] cardPanelsBuilder ( ) {
-        CardPanel[] deck = new CardPanel[52];
+        CardPanel[] deck = new CardPanel[ 52 ];
 
         for ( int i = 0; i < 52; i++ )
-            deck[i] = new CardPanel ( board.Stock.CardAt ( i ) );
+            deck[ i ] = new CardPanel ( board.Stock.CardAt ( i ) );
 
         return deck;
     }
@@ -198,7 +231,7 @@ public class Solitaire extends JFrame {
     private PilePanel wastePanelBuilder ( ) {
         PilePanel wastePanel = new PilePanel ( board.Waste );
 
-        wastePanel.setBackground ( Color.MAGENTA );
+        wastePanel.setBackground ( new Color ( 0x2b7b3b ) );
         wastePanel.setPreferredSize ( new Dimension ( CardPanel.cardWidth, CardPanel.cardHeight ) );
         leftPanel.add ( wastePanel );
 
@@ -239,7 +272,7 @@ public class Solitaire extends JFrame {
         topLevelPanel.add ( middlePanel, BorderLayout.CENTER );
         topLevelPanel.add ( rightPanel, BorderLayout.EAST );
 
-        return new JPanel[]{ topPanel, leftPanel, middlePanel, rightPanel };
+        return new JPanel[]{topPanel, leftPanel, middlePanel, rightPanel};
     }
 
     private JPanel topLevelFieldBuilder ( ) {
@@ -287,10 +320,10 @@ public class Solitaire extends JFrame {
 
         JPanel[] mainPanels = mainPanelsBuilder ( );
 
-        topPanel = mainPanels[0];
-        leftPanel = mainPanels[1];
-        middlePanel = mainPanels[2];
-        rightPanel = mainPanels[3];
+        topPanel = mainPanels[ 0 ];
+        leftPanel = mainPanels[ 1 ];
+        middlePanel = mainPanels[ 2 ];
+        rightPanel = mainPanels[ 3 ];
 
         stockPanel = stockPanelBuilder ( browse );
 
@@ -304,64 +337,64 @@ public class Solitaire extends JFrame {
 
         wastePanel.removeAll ( );
 
-        switch ( board.browse ( ) ) {
-            case -1 -> {
-                return;
-            }
-            case 0 -> {
-                wastePanel.cardPanel1 = null;
-                wastePanel.cardPanel2 = null;
-                wastePanel.cardPanel3 = null;
-            }
-            case 1 -> {
+        if ( board.browse ( ) < 1 ) {
 
-                switch ( board.Waste.size ( ) ) {
-                    case 1 -> {
-                        wastePanel.cardPanel1 = board.Waste.top ( ).cardPanel;
-                        wastePanel.cardPanel2 = null;
-                        wastePanel.cardPanel3 = null;
+            wastePanel.cardPanel1 = null;
+            wastePanel.cardPanel2 = null;
+            wastePanel.cardPanel3 = null;
+        }
+        else {
+            switch ( board.Waste.size ( ) ) {
+                case 1 -> {
+                    wastePanel.cardPanel1 = board.Waste.top ( ).cardPanel;
+                    wastePanel.cardPanel2 = null;
+                    wastePanel.cardPanel3 = null;
 
-                        wastePanel.cardPanel1.covered = CardCoverState.UNCONVERED;
+                    wastePanel.cardPanel1.covered = CardCoverState.UNCOVERED;
 
-                        wastePanel.cardPanel1.update ( );
+                    wastePanel.cardPanel1.updateCardPanel ( );
 
-                        wastePanel.add ( wastePanel.cardPanel1 );
-                    }
-                    case 2 -> {
-                        wastePanel.cardPanel1 = board.Waste.CardAt ( 1 ).cardPanel;
-                        wastePanel.cardPanel2 = board.Waste.top ( ).cardPanel;
-                        wastePanel.cardPanel3 = null;
+                    wastePanel.add ( wastePanel.cardPanel1 );
+                }
+                case 2 -> {
+                    wastePanel.cardPanel1 = board.Waste.CardAt ( 1 ).cardPanel;
+                    wastePanel.cardPanel2 = board.Waste.top ( ).cardPanel;
+                    wastePanel.cardPanel3 = null;
 
-                        wastePanel.cardPanel1.covered = CardCoverState.PARTIALLY_COVERED;
-                        wastePanel.cardPanel2.covered = CardCoverState.UNCONVERED;
+                    wastePanel.cardPanel1.covered = CardCoverState.PARTIALLY_COVERED;
+                    wastePanel.cardPanel2.covered = CardCoverState.UNCOVERED;
 
-                        wastePanel.cardPanel1.update ( );
-                        wastePanel.cardPanel2.update ( );
+                    wastePanel.cardPanel1.updateCardPanel ( );
+                    wastePanel.cardPanel2.updateCardPanel ( );
 
-                        wastePanel.add ( wastePanel.cardPanel1 );
-                        wastePanel.add ( wastePanel.cardPanel2 );
-                    }
-                    default -> {
-                        wastePanel.cardPanel1 = board.Waste.CardAt ( 2 ).cardPanel;
-                        wastePanel.cardPanel2 = board.Waste.CardAt ( 1 ).cardPanel;
-                        wastePanel.cardPanel3 = board.Waste.top ( ).cardPanel;
+                    wastePanel.add ( wastePanel.cardPanel1 );
+                    wastePanel.add ( wastePanel.cardPanel2 );
+                }
+                default -> {
+                    wastePanel.cardPanel1 = board.Waste.CardAt ( 2 ).cardPanel;
+                    wastePanel.cardPanel2 = board.Waste.CardAt ( 1 ).cardPanel;
+                    wastePanel.cardPanel3 = board.Waste.top ( ).cardPanel;
 
-                        wastePanel.cardPanel1.covered = CardCoverState.PARTIALLY_COVERED;
-                        wastePanel.cardPanel2.covered = CardCoverState.PARTIALLY_COVERED;
-                        wastePanel.cardPanel3.covered = CardCoverState.UNCONVERED;
+                    wastePanel.cardPanel1.covered = CardCoverState.PARTIALLY_COVERED;
+                    wastePanel.cardPanel2.covered = CardCoverState.PARTIALLY_COVERED;
+                    wastePanel.cardPanel3.covered = CardCoverState.UNCOVERED;
 
-                        wastePanel.cardPanel1.update ( );
-                        wastePanel.cardPanel2.update ( );
-                        wastePanel.cardPanel3.update ( );
+                    wastePanel.cardPanel1.updateCardPanel ( );
+                    wastePanel.cardPanel2.updateCardPanel ( );
+                    wastePanel.cardPanel3.updateCardPanel ( );
 
-                        wastePanel.add ( wastePanel.cardPanel1 );
-                        wastePanel.add ( wastePanel.cardPanel2 );
-                        wastePanel.add ( wastePanel.cardPanel3 );
-                    }
+                    wastePanel.add ( wastePanel.cardPanel1 );
+                    wastePanel.add ( wastePanel.cardPanel2 );
+                    wastePanel.add ( wastePanel.cardPanel3 );
                 }
             }
         }
 
+        stockPanel.cardPanel.setVisible ( board.Waste.size ( ) != 0 );
+
+        wastePanel.pack ( );
+
         wastePanel.repaint ( );
+        wastePanel.revalidate ( );
     }
 }

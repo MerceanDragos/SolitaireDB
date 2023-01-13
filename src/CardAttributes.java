@@ -29,5 +29,5 @@ enum CardNumber {
 enum CardCoverState {
     COVERED,
     PARTIALLY_COVERED,
-    UNCONVERED
+    UNCOVERED
 }

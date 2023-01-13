@@ -4,6 +4,8 @@ public class Card {
     final CardColor color;
     boolean faceUp;
 
+    CardCoverState state;
+
     Solitaire.CardPanel cardPanel;
 
     public Card ( CardNumber number, CardSuite suite ) {
@@ -13,6 +15,7 @@ public class Card {
             this.color = CardColor.RED;
         else
             this.color = CardColor.BLACK;
+        state = CardCoverState.COVERED;
     }
 
     public boolean faceUp ( ) {
@@ -23,5 +26,9 @@ public class Card {
 
     public void faceDown ( ) {
         this.faceUp = false;
+    }
+
+    public void setState ( CardCoverState newState ) {
+        state = newState;
     }
 }

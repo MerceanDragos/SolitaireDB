@@ -9,8 +9,7 @@ public class Board {
         public Card top ( ) {
             try {
                 return this.elementAt ( this.size ( ) - 1 );
-            }
-            catch ( ArrayIndexOutOfBoundsException e ) {
+            } catch ( ArrayIndexOutOfBoundsException e ) {
                 throw new EmptyStackException ( );
             }
         }
@@ -25,8 +24,7 @@ public class Board {
                 try {
                     this.elementAt ( i ).faceDown ( );
                     i++;
-                }
-                catch ( ArrayIndexOutOfBoundsException e ) {
+                } catch ( ArrayIndexOutOfBoundsException e ) {
                     break;
                 }
             }
@@ -38,8 +36,7 @@ public class Board {
                 try {
                     this.elementAt ( i ).faceUp ( );
                     i++;
-                }
-                catch ( ArrayIndexOutOfBoundsException e ) {
+                } catch ( ArrayIndexOutOfBoundsException e ) {
                     break;
                 }
             }
@@ -141,52 +138,49 @@ public class Board {
     Pile ClubsFoundation = new Pile ( );
     Pile HeartsFoundation = new Pile ( );
 
-    private boolean reveal ( ) {
+    private boolean revealCards ( ) {
         boolean flag = false;
         try {
             flag = this.Pile1.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile2.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile3.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile4.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile5.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile6.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
         try {
             flag |= this.Pile7.top ( ).faceUp ( );
-        }
-        catch ( EmptyStackException e ) {
+        } catch ( EmptyStackException e ) {
             assert true;
         }
 
         return flag;
+    }
+
+    private void setCoverStates ( ) {
+        Stock.top ( ).setState ( CardCoverState.UNCOVERED );
     }
 
     private Pile PileNr ( int n ) throws UnknownPileException {
@@ -358,7 +352,7 @@ public class Board {
         for ( int i = 0; i < 7; i++ )
             this.Pile7.push ( this.Stock.pop ( ) );
 
-        this.reveal ( );
+        this.revealCards ( );
     }
 
     public void printBoard ( ) {
@@ -403,8 +397,7 @@ public class Board {
         try {
             source = this.PileNr ( s );
             destination = this.PileNr ( d );
-        }
-        catch ( UnknownPileException e ) {
+        } catch ( UnknownPileException e ) {
             throw new InvalidMoveException ( );
         }
 
@@ -419,19 +412,19 @@ public class Board {
             for ( int i = 0; i < quantity; i++ )
                 destination.push ( aux.pop ( ) );
 
-            Move move = new Move ( this.reveal ( ), source, destination, quantity );
+            Move move = new Move ( this.revealCards ( ), source, destination, quantity );
             this.rememberMove ( move );
         }
         else {
             throw new InvalidMoveException ( );
         }
 
-        printBoard ();
+        printBoard ( );
     }
 
     public int browse ( ) {
         if ( this.Stock.empty ( ) && this.Waste.empty ( ) ) {
-            printBoard ();
+            printBoard ( );
             return -1;
         }
         else if ( this.Stock.empty ( ) ) {
@@ -443,7 +436,7 @@ public class Board {
             Move move = new Move ( 0 );
             this.rememberMove ( move );
 
-            printBoard ();
+            printBoard ( );
             return 0;
         }
         else {
@@ -459,7 +452,7 @@ public class Board {
             Move move = new Move ( i );
             this.rememberMove ( move );
 
-            printBoard ();
+            printBoard ( );
             return 1;
         }
     }
