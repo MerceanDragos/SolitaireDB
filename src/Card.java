@@ -1,12 +1,12 @@
 public class Card {
-    final CardNumber number;
-    final CardSuite suite;
-    final CardColor color;
-    boolean faceUp;
+    private final CardNumber number;
+    private final CardSuite suite;
+    private final CardColor color;
+    private boolean faceUp;
 
-    CardCoverState state;
+    private CardCoverState state;
 
-    Solitaire.CardPanel cardPanel;
+    private Solitaire.CardPanel cardPanel;
 
     public Card ( CardNumber number, CardSuite suite ) {
         this.suite = suite;
@@ -18,10 +18,24 @@ public class Card {
         state = CardCoverState.COVERED;
     }
 
-    public boolean faceUp ( ) {
-        boolean prev = this.faceUp;
-        this.faceUp = true;
-        return !prev;
+    public CardNumber getNumber ( ) {
+        return number;
+    }
+
+    public CardSuite getSuite ( ) {
+        return suite;
+    }
+
+    public CardColor getColor ( ) {
+        return color;
+    }
+
+    public boolean isFaceUp ( ) {
+        return faceUp;
+    }
+
+    public void faceUp ( ) {
+        faceUp = true;
     }
 
     public void faceDown ( ) {
@@ -30,5 +44,17 @@ public class Card {
 
     public void setState ( CardCoverState newState ) {
         state = newState;
+    }
+
+    public CardCoverState getState ( ) {
+        return state;
+    }
+
+    public void setCardPanel ( Solitaire.CardPanel correspondingCardPanel ) {
+        cardPanel = correspondingCardPanel;
+    }
+
+    public Solitaire.CardPanel getCardPanel ( ) {
+        return cardPanel;
     }
 }

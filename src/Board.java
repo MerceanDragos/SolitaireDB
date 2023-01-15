@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -6,10 +7,13 @@ public class Board {
 
     public static class Pile extends Stack< Card > {
 
+        Object pilePanel = null;
+
         public Card top ( ) {
             try {
                 return this.elementAt ( this.size ( ) - 1 );
-            } catch ( ArrayIndexOutOfBoundsException e ) {
+            }
+            catch ( ArrayIndexOutOfBoundsException e ) {
                 throw new EmptyStackException ( );
             }
         }
@@ -18,25 +22,27 @@ public class Board {
             return this.elementAt ( this.size ( ) - 1 - index );
         }
 
-        private void turnPile ( ) {
+        private void turnAll ( ) {
             int i = 0;
             while ( true ) {
                 try {
                     this.elementAt ( i ).faceDown ( );
                     i++;
-                } catch ( ArrayIndexOutOfBoundsException e ) {
+                }
+                catch ( ArrayIndexOutOfBoundsException e ) {
                     break;
                 }
             }
         }
 
-        private void unTurnPile ( ) {
+        private void unTurnAll ( ) {
             int i = 0;
             while ( true ) {
                 try {
                     this.elementAt ( i ).faceUp ( );
                     i++;
-                } catch ( ArrayIndexOutOfBoundsException e ) {
+                }
+                catch ( ArrayIndexOutOfBoundsException e ) {
                     break;
                 }
             }
@@ -44,17 +50,17 @@ public class Board {
 
         private void printPile ( int nrOfCards ) {
             if ( nrOfCards == 0 )
-                nrOfCards = this.size ( );
+                nrOfCards = size ( );
 
-            for ( int i = Math.max ( this.size ( ) - nrOfCards, 0 ); i < this.size ( ); i++ ) {
-                if ( !this.get ( i ).faceUp ) {
+            for ( int i = Math.max ( size ( ) - nrOfCards, 0 ); i < size ( ); i++ ) {
+                if ( !get ( i ).isFaceUp ( ) ) {
                     System.out.print ( TextColor.GREEN + "▮" + TextColor.RESET );
                     continue;
                 }
 
                 String name = "";
 
-                switch ( this.get ( i ).number ) {
+                switch ( get ( i ).getNumber ( ) ) {
                     case ACE -> name += "A";
                     case TWO -> name += "2";
                     case THREE -> name += "3";
@@ -70,7 +76,7 @@ public class Board {
                     case KING -> name += "K";
                 }
 
-                switch ( this.get ( i ).suite ) {
+                switch ( get ( i ).getSuite ( ) ) {
                     case SPADES -> name += "♠";
                     case DIAMONDS -> name += "♦";
                     case CLUBS -> name += "♣";
@@ -79,7 +85,7 @@ public class Board {
 
                 }
 
-                switch ( this.get ( i ).color ) {
+                switch ( get ( i ).getColor ( ) ) {
                     case RED -> System.out.print ( TextColor.RED );
                     case BLACK -> System.out.print ( TextColor.BLUE );
                 }
@@ -90,6 +96,73 @@ public class Board {
             System.out.println ( );
         }
 
+        private void fixStock ( ) {
+            for ( int i = 0; i < size ( ); i++ ) {
+                CardAt ( i ).faceDown ( );
+                if ( i != size ( ) - 1 )
+                    CardAt ( i ).setState ( CardCoverState.COVERED );
+                else
+                    CardAt ( i ).setState ( CardCoverState.UNCOVERED );
+            }
+
+            for ( int i = 0; i < size ( ); i++ )
+                CardAt ( i ).getCardPanel ().updateVisual ( );
+        }
+
+        private void fixWaste ( ) {
+
+            for ( int i = 0; i < size ( ); i++ ) {
+                CardAt ( i ).faceUp ( );
+                if ( i == 0 )
+                    CardAt ( i ).setState ( CardCoverState.UNCOVERED );
+                else if ( i == 1 || i == 2 )
+                    CardAt ( i ).setState ( CardCoverState.PARTIALLY_COVERED );
+                else
+                    CardAt ( i ).setState ( CardCoverState.COVERED );
+
+            }
+
+            for ( int i = 0; i < size ( ); i++ )
+                CardAt ( i ).getCardPanel ().updateVisual ( );
+        }
+
+        private void fixPile ( ) {
+            for ( int i = 0; i < size ( ); i++ ) {
+                if ( i != 0 )
+                    CardAt ( i ).setState ( CardCoverState.PARTIALLY_COVERED );
+                else
+                    CardAt ( i ).setState ( CardCoverState.UNCOVERED );
+            }
+
+            if ( !empty ( ) )
+                top ( ).faceUp ( );
+
+            for ( int i = 0; i < size ( ); i++ )
+                CardAt ( i ).getCardPanel ().updateVisual ( );
+        }
+
+        private void fixFoundation ( ) {
+            if ( size ( ) > 1 ) {
+                CardAt ( 1 ).setState ( CardCoverState.COVERED );
+                CardAt ( 1 ).getCardPanel ().updateVisual ( );
+            }
+
+            if ( !empty ( ) ) {
+                top ( ).setState ( CardCoverState.UNCOVERED );
+                top ( ).faceUp ( );
+
+                top ( ).getCardPanel ().updateVisual ( );
+            }
+        }
+
+        public int indexOf ( Card card ) {
+            int i = 0;
+
+            while ( i < size ( ) && CardAt ( i ) != card )
+                i++;
+
+            return i;
+        }
     }
 
     private static class Move {
@@ -101,7 +174,7 @@ public class Board {
         int nrOfCards;
 
         private Move ( int nrOfCards ) {
-            this.browseMove = true;
+            browseMove = true;
             this.nrOfCards = nrOfCards;
         }
 
@@ -114,10 +187,6 @@ public class Board {
     }
 
     public static class InvalidMoveException extends Exception {
-
-    }
-
-    public static class UnknownPileException extends Exception {
     }
 
     Stack< Move > Moves = new Stack< Move > ( );
@@ -138,142 +207,30 @@ public class Board {
     Pile ClubsFoundation = new Pile ( );
     Pile HeartsFoundation = new Pile ( );
 
-    private boolean revealCards ( ) {
-        boolean flag = false;
-        try {
-            flag = this.Pile1.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile2.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile3.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile4.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile5.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile6.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-        try {
-            flag |= this.Pile7.top ( ).faceUp ( );
-        } catch ( EmptyStackException e ) {
-            assert true;
-        }
-
-        return flag;
-    }
-
-    private void setCoverStates ( ) {
-        Stock.top ( ).setState ( CardCoverState.UNCOVERED );
-    }
-
-    private Pile PileNr ( int n ) throws UnknownPileException {
-        if ( n < 0 || n > 11 )
-            throw new UnknownPileException ( );
-
-        switch ( n ) {
-            case 0 -> {
-                return this.Waste;
-            }
-            case 1 -> {
-                return this.Pile1;
-            }
-            case 2 -> {
-                return this.Pile2;
-            }
-            case 3 -> {
-                return this.Pile3;
-            }
-            case 4 -> {
-                return this.Pile4;
-            }
-            case 5 -> {
-                return this.Pile5;
-            }
-            case 6 -> {
-                return this.Pile6;
-            }
-            case 7 -> {
-                return this.Pile7;
-            }
-            case 8 -> {
-                return this.SpadesFoundation;
-            }
-            case 9 -> {
-                return this.DiamondsFoundation;
-            }
-            case 10 -> {
-                return this.ClubsFoundation;
-            }
-            default -> {
-                return this.HeartsFoundation;
-            }
-        }
+    private void fixUp ( Pile pile ) {
+        if ( pile.equals ( Stock ) )
+            Stock.fixStock ( );
+        else if ( pile.equals ( Waste ) )
+            pile.fixWaste ( );
+        else if ( pile.equals ( SpadesFoundation ) || pile.equals ( DiamondsFoundation ) || pile.equals ( ClubsFoundation ) || pile.equals ( HeartsFoundation ) )
+            pile.fixFoundation ( );
+        else
+            pile.fixPile ( );
     }
 
     private boolean validMove ( Pile source, Pile destination, int quantity ) {
         if ( destination == this.SpadesFoundation )
-            return quantity == 1 && source.top ( ).suite == CardSuite.SPADES && ( ( destination.empty ( ) && source.top ( ).number == CardNumber.ACE ) || source.top ( ).number.ordinal ( ) == destination.top ( ).number.ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.SPADES && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
         else if ( destination == this.DiamondsFoundation )
-            return quantity == 1 && source.top ( ).suite == CardSuite.DIAMONDS && ( ( destination.empty ( ) && source.top ( ).number == CardNumber.ACE ) || source.top ( ).number.ordinal ( ) == destination.top ( ).number.ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.DIAMONDS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
         else if ( destination == this.ClubsFoundation )
-            return quantity == 1 && source.top ( ).suite == CardSuite.CLUBS && ( ( destination.empty ( ) && source.top ( ).number == CardNumber.ACE ) || source.top ( ).number.ordinal ( ) == destination.top ( ).number.ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.CLUBS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
         else if ( destination == this.HeartsFoundation )
-            return quantity == 1 && source.top ( ).suite == CardSuite.HEARTS && ( ( destination.empty ( ) && source.top ( ).number == CardNumber.ACE ) || source.top ( ).number.ordinal ( ) == destination.top ( ).number.ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.HEARTS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
         else if ( destination.empty ( ) )
-            return quantity <= source.size ( ) && source.CardAt ( quantity - 1 ).faceUp && source.CardAt ( quantity - 1 ).number == CardNumber.KING;
+            return quantity <= source.size ( ) && source.CardAt ( quantity - 1 ).isFaceUp ( ) && source.CardAt ( quantity - 1 ).getNumber ( ) == CardNumber.KING;
         else
-            return quantity <= source.size ( ) && source.CardAt ( quantity - 1 ).faceUp && source.CardAt ( quantity - 1 ).color != destination.top ( ).color && source.CardAt ( quantity - 1 ).number.ordinal ( ) + 1 == destination.top ( ).number.ordinal ( );
-    }
-
-    private void rememberMove ( Move move ) {
-        this.Moves.push ( move );
-    }
-
-    private void undoMove ( Move move ) {
-        if ( move.revealedCard )
-            move.source.top ( ).faceDown ( );
-
-        Pile aux = new Pile ( );
-
-        for ( int i = 0; i < move.nrOfCards; i++ )
-            aux.push ( move.destination.pop ( ) );
-
-        for ( int i = 0; i < move.nrOfCards; i++ )
-            move.source.push ( aux.pop ( ) );
-
-    }
-
-    private void undoBrowse ( Move move ) {
-        if ( move.nrOfCards == 0 ) {
-            Pile aux;
-            aux = this.Stock;
-            this.Stock = this.Waste;
-            this.Waste = aux;
-            this.Waste.unTurnPile ( );
-        }
-        else {
-            for ( int i = 0; i < move.nrOfCards; i++ ) {
-                this.Waste.top ( ).faceDown ( );
-                this.Stock.push ( this.Waste.pop ( ) );
-            }
-        }
+            return quantity <= source.size ( ) && source.CardAt ( quantity - 1 ).isFaceUp ( ) && source.CardAt ( quantity - 1 ).getColor ( ) != destination.top ( ).getColor ( ) && source.CardAt ( quantity - 1 ).getNumber ( ).ordinal ( ) + 1 == destination.top ( ).getNumber ( ).ordinal ( );
     }
 
     public Board ( ) {
@@ -323,7 +280,7 @@ public class Board {
             Stock.push ( HeartsFoundation.pop ( ) );
 
         for ( int i = 0; i < 52; i++ )
-            Stock.CardAt ( 0 ).faceDown ( );
+            Stock.CardAt ( i ).faceDown ( );
     }
 
     public void newGame ( ) {
@@ -352,7 +309,15 @@ public class Board {
         for ( int i = 0; i < 7; i++ )
             this.Pile7.push ( this.Stock.pop ( ) );
 
-        this.revealCards ( );
+        Stock.fixStock ( );
+
+        Pile1.fixPile ( );
+        Pile2.fixPile ( );
+        Pile3.fixPile ( );
+        Pile4.fixPile ( );
+        Pile5.fixPile ( );
+        Pile6.fixPile ( );
+        Pile7.fixPile ( );
     }
 
     public void printBoard ( ) {
@@ -386,34 +351,26 @@ public class Board {
 
     }
 
-    public void move ( int s, int d, int quantity ) throws InvalidMoveException {
+    public void move ( Pile source, Pile destination, int quantity ) throws InvalidMoveException {
 
-        if ( d == 0 )
+        if ( destination == Waste )
             throw new InvalidMoveException ( );
 
-        Pile source;
-        Pile destination;
-
-        try {
-            source = this.PileNr ( s );
-            destination = this.PileNr ( d );
-        } catch ( UnknownPileException e ) {
-            throw new InvalidMoveException ( );
-        }
-
-
-        if ( this.validMove ( source, destination, quantity ) ) {
+        if ( validMove ( source, destination, quantity ) ) {
 
             Pile aux = new Pile ( );
 
             for ( int i = 0; i < quantity; i++ )
-                aux.push ( source.pop ( ) );
+                aux.push ( ( Card ) source.pop ( ) );
 
             for ( int i = 0; i < quantity; i++ )
-                destination.push ( aux.pop ( ) );
+                destination.push ( ( Card ) aux.pop ( ) );
 
-            Move move = new Move ( this.revealCards ( ), source, destination, quantity );
-            this.rememberMove ( move );
+            Move move = new Move ( source.size ( ) != 0 && !source.top ( ).isFaceUp ( ), source, destination, quantity );
+            Moves.push ( move );
+
+            fixUp ( source );
+            fixUp ( destination );
         }
         else {
             throw new InvalidMoveException ( );
@@ -422,39 +379,34 @@ public class Board {
         printBoard ( );
     }
 
-    public int browse ( ) {
-        if ( this.Stock.empty ( ) && this.Waste.empty ( ) ) {
-            printBoard ( );
-            return -1;
-        }
-        else if ( this.Stock.empty ( ) ) {
-            Pile aux;
-            aux = this.Stock;
-            this.Stock = this.Waste;
-            this.Waste = aux;
-            this.Stock.turnPile ( );
-            Move move = new Move ( 0 );
-            this.rememberMove ( move );
+    public void browse ( ) {
 
-            printBoard ( );
-            return 0;
-        }
-        else {
-            int i = 0;
-            Card aux;
-            while ( !this.Stock.empty ( ) && i < 3 ) {
-                aux = this.Stock.pop ( );
-                aux.faceUp ( );
-                this.Waste.push ( aux );
+        if ( Stock.empty ( ) && Waste.empty ( ) )
+            return;
+
+        int i = 0;
+        boolean flag = false;
+        if ( !Stock.empty ( ) ) {
+            while ( !Stock.empty ( ) && i < 3 ) {
+                Waste.push ( Stock.pop ( ) );
                 i++;
             }
-
-            Move move = new Move ( i );
-            this.rememberMove ( move );
-
-            printBoard ( );
-            return 1;
         }
+        else if ( Stock.empty ( ) && !Waste.empty ( ) ) {
+            flag = true;
+            while ( !Waste.empty ( ) ) {
+                Stock.push ( Waste.pop ( ) );
+            }
+
+            Stock.turnAll ( );
+        }
+
+        Moves.push ( new Move ( ( flag ) ? 0 : i ) );
+
+        Stock.fixStock ( );
+        Waste.fixWaste ( );
+
+        printBoard ( );
     }
 
     public void undo ( ) {
@@ -469,11 +421,39 @@ public class Board {
             this.undoMove ( lastMove );
     }
 
+    private void undoMove ( Move move ) {
+        if ( move.revealedCard )
+            move.source.top ( ).faceDown ( );
+
+        Pile aux = new Pile ( );
+
+        for ( int i = 0; i < move.nrOfCards; i++ )
+            aux.push ( move.destination.pop ( ) );
+
+        for ( int i = 0; i < move.nrOfCards; i++ )
+            move.source.push ( aux.pop ( ) );
+
+        fixUp ( move.source );
+        fixUp ( move.destination );
+    }
+
+    private void undoBrowse ( Move move ) {
+        if ( move.nrOfCards == 0 )
+            while ( !Stock.empty ( ) )
+                Waste.push ( Stock.pop ( ) );
+        else
+            for ( int i = 0; i < move.nrOfCards; i++ )
+                Stock.push ( Waste.pop ( ) );
+
+
+        fixUp ( Stock );
+        fixUp ( Waste );
+    }
+
     public boolean checkForWin ( ) {
         return this.ClubsFoundation.size ( ) == 13 &&
                 this.SpadesFoundation.size ( ) == 13 &&
                 this.DiamondsFoundation.size ( ) == 13 &&
                 this.HeartsFoundation.size ( ) == 13;
     }
-
 }
