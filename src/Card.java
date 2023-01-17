@@ -6,7 +6,7 @@ public class Card {
 
     private CardCoverState state;
 
-    private Solitaire.CardPanel cardPanel;
+    private CardPanel correspondingPanel;
 
     public Card ( CardNumber number, CardSuite suite ) {
         this.suite = suite;
@@ -50,11 +50,11 @@ public class Card {
         return state;
     }
 
-    public void setCardPanel ( Solitaire.CardPanel correspondingCardPanel ) {
-        cardPanel = correspondingCardPanel;
+    public void setCorrespondingPanel ( CardPanel correspondingCardPanel ) {
+        correspondingPanel = correspondingCardPanel;
     }
 
-    public Solitaire.CardPanel getCardPanel ( ) {
-        return cardPanel;
+    public CardPanel getCorrespondingPanel ( ) {
+        return correspondingPanel;
     }
 }

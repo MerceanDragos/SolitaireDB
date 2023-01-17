@@ -4,11 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="21eda6b2-3857-4647-aca2-7c5e580fe7af" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="21eda6b2-3857-4647-aca2-7c5e580fe7af" name="Changes" comment="Working">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/postgresql.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/postgresql1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/checker-qual-3.5.0.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/mysql-connector-java-8.0.13.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/postgresql-42.1.4.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/postgresql-42.5.1.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/protobuf-java-3.6.1.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CardPanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Driver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/FoundationPanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LogInScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/PerformanceFrame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/PilePanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/SolitaireDataBase.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/SolitaireFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/StockPanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/WastePanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Solitaire3.0.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Solitaire3.0.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Card.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Solitaire.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Solitaire.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,13 +52,20 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2KEfeWH31iTJjUnASvivbFQttQJ" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
@@ -47,7 +75,16 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
   }
 }</component>
   <component name="RunManager">
@@ -76,45 +113,55 @@
       <workItem from="1673596262948" duration="9360000" />
       <workItem from="1673629025259" duration="16358000" />
       <workItem from="1673700107930" duration="14391000" />
-      <workItem from="1673716584276" duration="45609000" />
+      <workItem from="1673716584276" duration="77397000" />
+      <workItem from="1673898566016" duration="89000" />
+      <workItem from="1673899050103" duration="841000" />
+      <workItem from="1673902029703" duration="2061000" />
+      <workItem from="1673909936904" duration="608000" />
+      <workItem from="1673914784154" duration="6456000" />
+      <workItem from="1673921269304" duration="31954000" />
     </task>
+    <task id="LOCAL-00001" summary="Working">
+      <created>1673797924864</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1673797924864</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Working" />
+    <option name="LAST_COMMIT_MESSAGE" value="Working" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Board.java</url>
-          <line>448</line>
-          <option name="timeStamp" value="59" />
+          <url>file://$PROJECT_DIR$/src/SolitaireDataBase.java</url>
+          <line>110</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Board.java</url>
-          <line>440</line>
-          <option name="timeStamp" value="60" />
+          <url>file://$PROJECT_DIR$/src/SolitaireDataBase.java</url>
+          <line>140</line>
+          <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Solitaire.java</url>
-          <line>253</line>
-          <option name="timeStamp" value="62" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Solitaire.java</url>
-          <line>248</line>
-          <option name="timeStamp" value="64" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Board.java</url>
-          <line>281</line>
-          <option name="timeStamp" value="65" />
+          <url>file://$PROJECT_DIR$/src/SolitaireDataBase.java</url>
+          <line>148</line>
+          <option name="timeStamp" value="30" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
+        <PinnedItemInfo parentTag="javax.swing.JLabel" memberName="text" />
         <PinnedItemInfo parentTag="Solitaire$CardPanel" memberName="upperPanel" />
         <PinnedItemInfo parentTag="Solitaire" memberName="rightPanel" />
         <PinnedItemInfo parentTag="Solitaire$CardPanel" memberName="mouseListener" />

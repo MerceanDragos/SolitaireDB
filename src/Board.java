@@ -1,4 +1,5 @@
-import javax.swing.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -104,13 +105,9 @@ public class Board {
                 else
                     CardAt ( i ).setState ( CardCoverState.UNCOVERED );
             }
-
-            for ( int i = 0; i < size ( ); i++ )
-                CardAt ( i ).getCardPanel ().updateVisual ( );
         }
 
         private void fixWaste ( ) {
-
             for ( int i = 0; i < size ( ); i++ ) {
                 CardAt ( i ).faceUp ( );
                 if ( i == 0 )
@@ -121,9 +118,6 @@ public class Board {
                     CardAt ( i ).setState ( CardCoverState.COVERED );
 
             }
-
-            for ( int i = 0; i < size ( ); i++ )
-                CardAt ( i ).getCardPanel ().updateVisual ( );
         }
 
         private void fixPile ( ) {
@@ -136,22 +130,16 @@ public class Board {
 
             if ( !empty ( ) )
                 top ( ).faceUp ( );
-
-            for ( int i = 0; i < size ( ); i++ )
-                CardAt ( i ).getCardPanel ().updateVisual ( );
         }
 
         private void fixFoundation ( ) {
             if ( size ( ) > 1 ) {
                 CardAt ( 1 ).setState ( CardCoverState.COVERED );
-                CardAt ( 1 ).getCardPanel ().updateVisual ( );
             }
 
             if ( !empty ( ) ) {
                 top ( ).setState ( CardCoverState.UNCOVERED );
                 top ( ).faceUp ( );
-
-                top ( ).getCardPanel ().updateVisual ( );
             }
         }
 
@@ -189,7 +177,9 @@ public class Board {
     public static class InvalidMoveException extends Exception {
     }
 
-    Stack< Move > Moves = new Stack< Move > ( );
+    public Stack< Move > Moves = new Stack< Move > ( );
+    private Instant start;
+    private Instant end;
 
     Pile Stock = new Pile ( );
     Pile Waste = new Pile ( );
@@ -220,13 +210,13 @@ public class Board {
 
     private boolean validMove ( Pile source, Pile destination, int quantity ) {
         if ( destination == this.SpadesFoundation )
-            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.SPADES && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.SPADES && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || ( !destination.empty ( ) && source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 ) );
         else if ( destination == this.DiamondsFoundation )
-            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.DIAMONDS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.DIAMONDS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || ( !destination.empty ( ) && source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 ) );
         else if ( destination == this.ClubsFoundation )
-            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.CLUBS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.CLUBS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || ( !destination.empty ( ) && source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 ) );
         else if ( destination == this.HeartsFoundation )
-            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.HEARTS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 );
+            return quantity == 1 && source.top ( ).getSuite ( ) == CardSuite.HEARTS && ( ( destination.empty ( ) && source.top ( ).getNumber ( ) == CardNumber.ACE ) || ( !destination.empty ( ) && source.top ( ).getNumber ( ).ordinal ( ) == destination.top ( ).getNumber ( ).ordinal ( ) + 1 ) );
         else if ( destination.empty ( ) )
             return quantity <= source.size ( ) && source.CardAt ( quantity - 1 ).isFaceUp ( ) && source.CardAt ( quantity - 1 ).getNumber ( ) == CardNumber.KING;
         else
@@ -284,30 +274,33 @@ public class Board {
     }
 
     public void newGame ( ) {
+        Moves.clear ( );
+
         if ( Stock.size ( ) != 52 )
             gatherCards ( );
 
-        Collections.shuffle ( this.Stock );
 
-        this.Pile1.push ( this.Stock.pop ( ) );
+        Collections.shuffle ( Stock );
+
+        Pile1.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 2; i++ )
-            this.Pile2.push ( this.Stock.pop ( ) );
+            Pile2.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 3; i++ )
-            this.Pile3.push ( this.Stock.pop ( ) );
+            Pile3.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 4; i++ )
-            this.Pile4.push ( this.Stock.pop ( ) );
+            Pile4.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 5; i++ )
-            this.Pile5.push ( this.Stock.pop ( ) );
+            Pile5.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 6; i++ )
-            this.Pile6.push ( this.Stock.pop ( ) );
+            Pile6.push ( Stock.pop ( ) );
 
         for ( int i = 0; i < 7; i++ )
-            this.Pile7.push ( this.Stock.pop ( ) );
+            Pile7.push ( Stock.pop ( ) );
 
         Stock.fixStock ( );
 
@@ -318,6 +311,53 @@ public class Board {
         Pile5.fixPile ( );
         Pile6.fixPile ( );
         Pile7.fixPile ( );
+
+        SpadesFoundation.fixFoundation ( );
+        DiamondsFoundation.fixFoundation ( );
+        ClubsFoundation.fixFoundation ( );
+        HeartsFoundation.fixFoundation ( );
+
+        printBoard ( );
+    }
+
+    public void newWinnableGame ( ) {
+        if ( Stock.size ( ) != 52 )
+            gatherCards ( );
+
+        for ( int i = 0; i < 13; i++ )
+            Pile1.push ( Stock.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            HeartsFoundation.push ( Pile1.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            Pile1.push ( Stock.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            ClubsFoundation.push ( Pile1.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            Pile1.push ( Stock.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            DiamondsFoundation.push ( Pile1.pop ( ) );
+        for ( int i = 0; i < 13; i++ )
+            Pile1.push ( Stock.pop ( ) );
+        for ( int i = 0; i < 12; i++ )
+            SpadesFoundation.push ( Pile1.pop ( ) );
+
+
+        Stock.fixStock ( );
+
+        Pile1.fixPile ( );
+        Pile2.fixPile ( );
+        Pile3.fixPile ( );
+        Pile4.fixPile ( );
+        Pile5.fixPile ( );
+        Pile6.fixPile ( );
+        Pile7.fixPile ( );
+
+        SpadesFoundation.fixFoundation ( );
+        DiamondsFoundation.fixFoundation ( );
+        ClubsFoundation.fixFoundation ( );
+        HeartsFoundation.fixFoundation ( );
+
+        printBoard ( );
     }
 
     public void printBoard ( ) {
@@ -358,6 +398,7 @@ public class Board {
 
         if ( validMove ( source, destination, quantity ) ) {
 
+
             Pile aux = new Pile ( );
 
             for ( int i = 0; i < quantity; i++ )
@@ -380,6 +421,8 @@ public class Board {
     }
 
     public void browse ( ) {
+        if ( Moves.empty ( ) )
+            startTime ( );
 
         if ( Stock.empty ( ) && Waste.empty ( ) )
             return;
@@ -456,4 +499,33 @@ public class Board {
                 this.DiamondsFoundation.size ( ) == 13 &&
                 this.HeartsFoundation.size ( ) == 13;
     }
+
+    public void startTime ( ) {
+        start = Instant.now ( );
+    }
+
+    public void stopTime ( ) {
+        end = Instant.now ( );
+    }
+
+    public String getTime ( ) {
+        long milliSeconds = Duration.between ( start, end ).toMillis ( );
+
+        int minutes = ( int ) ( milliSeconds / 1000 ) / 60;
+
+        int seconds = ( int ) ( milliSeconds / 1000 ) % 60;
+
+        String secondsString = ( ( seconds < 10 ) ? "0" : "" ) + String.valueOf ( seconds );
+
+        return minutes + ":" + secondsString;
+    }
+
+    public double getTimeDouble ( ) {
+        return ( double ) Duration.between ( start, end ).toMillis ( );
+    }
+
+    public int getMoves ( ) {
+        return Moves.size ( );
+    }
+
 }
